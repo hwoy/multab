@@ -152,4 +152,4 @@ for(k=col;(k/col)<=(to/col)+(to%col?1:0);k+=col)
 	putchar('\n');putchar('\n');
 }
 
-} 
+}
