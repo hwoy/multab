@@ -55,4 +55,4 @@ void
 opt_setIndex (int index)
 {
   i_upindex = index;
-
+}
