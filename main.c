@@ -30,7 +30,9 @@ enum
 
 static const char *err_str[] =
   { "Invalid option", "Not an unsigned integer", "Col is zero", "Form > To",
-"M_begin > M_end", NULL };
+  "M_begin > M_end", NULL
+};
+
 enum
 {
   err_inv, err_ni, err_cz, err_fot, err_boe
@@ -161,20 +163,18 @@ printtable (unsigned int from, unsigned int to, unsigned int mbegin,
 {
   unsigned int i, j, k;
 
-  for (k = from; k <=to ; k += col)
-    {	
-      for (j = mbegin; j <= mend ; j++)
+  for (k = from; k <= to; k += col)
+    {
+      for (j = mbegin; j <= mend; j++)
 	{
-	  for (i = k;
-	       i < ((k+col)>to?to+1:k+col) ; i++)
+	  for (i = k; i < ((k + col) > to ? to + 1 : k + col); i++)
 	    {
 	      printf ("%ux%u=%u\t\t", i, j, i * j);
 	    }
-		putchar ('\n');
+	  putchar ('\n');
 	}
       putchar ('\n');
       putchar ('\n');
-	
-    }
 
+    }
 }
