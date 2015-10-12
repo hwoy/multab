@@ -1,5 +1,5 @@
 cc = gcc
-bin = table.exe
+bin = multab.exe
 CFLAGS =  -O2  -ansi -Wpedantic -Wall -Werror
 
 .PHONY: all clean
