@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "function.h"
 #include "opt.h"
 
@@ -44,7 +45,7 @@ enum
 int
 main (int argc, const char *argv[])
 {
-  static char carray_buff[BSIZE];
+  static char carray_buff[BSIZE], filename[BSIZE];
   int i;
   unsigned int ui_cindex;
   unsigned int mbegin, mend, from, to, col;
@@ -55,6 +56,8 @@ main (int argc, const char *argv[])
   from = FROM;
   to = TO;
   col = COL;
+
+  filename[0] = 0;
   fp = stdout;
 
   for (ui_cindex = 1; (i =
@@ -68,11 +71,10 @@ main (int argc, const char *argv[])
 	case opt_b:
 	case opt_e:
 	case opt_c:
+
 	  if (!isUint (carray_buff))
-	    {
-	      fclose (fp);
-	      return showErr (err_str, err_ni, carray_buff);
-	    }
+	    return showErr (err_str, err_ni, carray_buff);
+
 	  switch (i)
 	    {
 	    case opt_f:
@@ -89,24 +91,20 @@ main (int argc, const char *argv[])
 	      break;
 	    case opt_c:
 	      if (!(col = s2ui (carray_buff)))
-		{
-		  fclose (fp);
-		  return showErr (err_str, err_cz, carray_buff);
-		}
+		return showErr (err_str, err_cz, carray_buff);
+	      break;
 	    }
 	  break;
+
 	case opt_o:
-	  if (!(fp = fopen (carray_buff, "w")))
-	    return showErr (err_str, err_af, carray_buff);
+	  strcpy (filename, carray_buff);
 	  break;
 
 	case opt_h:
-	  fclose (fp);
 	  showHelp (argv[0], cptrarr_param, helpparam);
 	  return 0;
 
 	default:
-	  fclose (fp);
 	  showHelp (argv[0], cptrarr_param, helpparam);
 	  return showErr (err_str, err_inv, carray_buff);
 	}
@@ -115,11 +113,17 @@ main (int argc, const char *argv[])
   carray_buff[0] = 0;
   if (from > to)
     return showErr (err_str, err_fot, carray_buff);
+
   if (mbegin > mend)
     return showErr (err_str, err_boe, carray_buff);
 
+  if (filename[0])
+    if (!(fp = fopen (filename, "w")))
+      return showErr (err_str, err_af, carray_buff);
+
   printtable (from, to, mbegin, mend, col, fp);
   fclose (fp);
+
   return 0;
 
 }
