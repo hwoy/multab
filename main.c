@@ -16,26 +16,29 @@ static int showErr (const char **str, int errno, const char *msg);
 static unsigned int basename (const char *ch);
 static void printtable (unsigned int from, unsigned int to,
 			unsigned int mbegin, unsigned int mend,
-			unsigned int col);
+			unsigned int col, FILE * fp);
 
 static const char *cptrarr_param[] =
-  { "-f:", "-t:", "-b:", "-e:", "-c:", "-h", NULL };
+  { "-f:", "-t:", "-b:", "-e:", "-c:", "-o:", "-h", NULL };
 static const char *helpparam[] =
-  { "From", "To", "Mul Begin", "Mul End", "Cols", "Help", NULL };
+  { "From", "To", "Mul Begin", "Mul End", "Cols", "Out put to file", "Help",
+  NULL
+};
+
 enum
 {
-  opt_f, opt_t, opt_b, opt_e, opt_c, opt_h
+  opt_f, opt_t, opt_b, opt_e, opt_c, opt_o, opt_h
 };
 
 
 static const char *err_str[] =
   { "Invalid option", "Not an unsigned integer", "Col is zero", "Form > To",
-  "M_begin > M_end", NULL
+  "M_begin > M_end", "Can not access file", NULL
 };
 
 enum
 {
-  err_inv, err_ni, err_cz, err_fot, err_boe
+  err_inv, err_ni, err_cz, err_fot, err_boe, err_af
 };
 
 int
@@ -45,70 +48,78 @@ main (int argc, const char *argv[])
   int i;
   unsigned int ui_cindex;
   unsigned int mbegin, mend, from, to, col;
+  FILE *fp;
 
   mbegin = MUL_BEGIN;
   mend = MUL_END;
   from = FROM;
   to = TO;
   col = COL;
+  fp = stdout;
 
   for (ui_cindex = 1; (i =
 		       opt_action (argc, argv, cptrarr_param, carray_buff,
 				   BSIZE, DSTART)) != e_optend; ui_cindex++)
     {
-
-
       switch (i)
 	{
 	case opt_f:
-	  if (!isUint (carray_buff))
-	    return showErr (err_str, err_ni, carray_buff);
-	  from = s2ui (carray_buff);
-	  break;
-
 	case opt_t:
-	  if (!isUint (carray_buff))
-	    return showErr (err_str, err_ni, carray_buff);
-	  to = s2ui (carray_buff);
-	  break;
-
 	case opt_b:
-	  if (!isUint (carray_buff))
-	    return showErr (err_str, err_ni, carray_buff);
-	  mbegin = s2ui (carray_buff);
-	  break;
-
 	case opt_e:
-	  if (!isUint (carray_buff))
-	    return showErr (err_str, err_ni, carray_buff);
-	  mend = s2ui (carray_buff);
-	  break;
-
 	case opt_c:
 	  if (!isUint (carray_buff))
-	    return showErr (err_str, err_ni, carray_buff);
-	  if (!(col = s2ui (carray_buff)))
-	    return showErr (err_str, err_cz, carray_buff);
+	    {
+	      fclose (fp);
+	      return showErr (err_str, err_ni, carray_buff);
+	    }
+	  switch (i)
+	    {
+	    case opt_f:
+	      from = s2ui (carray_buff);
+	      break;
+	    case opt_t:
+	      to = s2ui (carray_buff);
+	      break;
+	    case opt_b:
+	      mbegin = s2ui (carray_buff);
+	      break;
+	    case opt_e:
+	      mend = s2ui (carray_buff);
+	      break;
+	    case opt_c:
+	      if (!(col = s2ui (carray_buff)))
+		{
+		  fclose (fp);
+		  return showErr (err_str, err_cz, carray_buff);
+		}
+	    }
+	  break;
+	case opt_o:
+	  if (!(fp = fopen (carray_buff, "w")))
+	    return showErr (err_str, err_af, carray_buff);
 	  break;
 
 	case opt_h:
+	  fclose (fp);
 	  showHelp (argv[0], cptrarr_param, helpparam);
 	  return 0;
 
 	default:
+	  fclose (fp);
 	  showHelp (argv[0], cptrarr_param, helpparam);
 	  return showErr (err_str, err_inv, carray_buff);
-
 	}
-
     }
+
   carray_buff[0] = 0;
   if (from > to)
     return showErr (err_str, err_fot, carray_buff);
   if (mbegin > mend)
     return showErr (err_str, err_boe, carray_buff);
 
-  printtable (from, to, mbegin, mend, col);
+  printtable (from, to, mbegin, mend, col, fp);
+  fclose (fp);
   return 0;
 
 }
@@ -128,11 +139,11 @@ showHelp (const char *str, const char **param, const char **hparam)
   fprintf (stderr, "\n");
 
   fprintf (stderr, "[DEFAULT]\n");
-  fprintf (stderr, "%s = %u\n", param[i = 0], FROM);
-  fprintf (stderr, "%s = %u\n", param[++i], TO);
-  fprintf (stderr, "%s = %u\n", param[++i], MUL_BEGIN);
-  fprintf (stderr, "%s = %u\n", param[++i], MUL_END);
-  fprintf (stderr, "%s = %u\n", param[++i], COL);
+  fprintf (stderr, "%s%u\n", param[i = 0], FROM);
+  fprintf (stderr, "%s%u\n", param[++i], TO);
+  fprintf (stderr, "%s%u\n", param[++i], MUL_BEGIN);
+  fprintf (stderr, "%s%u\n", param[++i], MUL_END);
+  fprintf (stderr, "%s%u\n", param[++i], COL);
   fprintf (stderr, "\n");
 }
 
@@ -159,7 +170,7 @@ basename (const char *ch)
 
 static void
 printtable (unsigned int from, unsigned int to, unsigned int mbegin,
-	    unsigned int mend, unsigned int col)
+	    unsigned int mend, unsigned int col, FILE * fp)
 {
   unsigned int i, j, k;
 
@@ -169,12 +180,11 @@ printtable (unsigned int from, unsigned int to, unsigned int mbegin,
 	{
 	  for (i = k; i < ((k + col) > to ? to + 1 : k + col); i++)
 	    {
-	      printf ("%ux%u=%u\t\t", i, j, i * j);
+	      fprintf (fp, "%ux%u=%u\t\t", i, j, i * j);
 	    }
-	  putchar ('\n');
+	  fprintf (fp, "\n");
 	}
-      putchar ('\n');
-      putchar ('\n');
-
+      fprintf (fp, "\n");
+      fprintf (fp, "\n");
     }
 }
