@@ -47,6 +47,7 @@ main (int argc, const char *argv[])
 {
   static char carray_buff[BSIZE], filename[BSIZE];
   int i;
+  unsigned int m;
   unsigned int ui_cindex;
   unsigned int mbegin, mend, from, to, col;
   FILE *fp;
@@ -75,22 +76,24 @@ main (int argc, const char *argv[])
 	  if (!isUint (carray_buff))
 	    return showErr (err_str, err_ni, carray_buff);
 
+	  m = s2ui (carray_buff);
+
 	  switch (i)
 	    {
 	    case opt_f:
-	      from = s2ui (carray_buff);
+	      from = m;
 	      break;
 	    case opt_t:
-	      to = s2ui (carray_buff);
+	      to = m;
 	      break;
 	    case opt_b:
-	      mbegin = s2ui (carray_buff);
+	      mbegin = m;
 	      break;
 	    case opt_e:
-	      mend = s2ui (carray_buff);
+	      mend = m;
 	      break;
 	    case opt_c:
-	      if (!(col = s2ui (carray_buff)))
+	      if (!(col = m))
 		return showErr (err_str, err_cz, carray_buff);
 	      break;
 	    }
