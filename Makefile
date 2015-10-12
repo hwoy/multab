@@ -1,5 +1,5 @@
 cc = gcc
-bin = multab
+bin = multab.exe
 CFLAGS =  -O2  -ansi -Wpedantic -Wall -Werror
 
 .PHONY: all clean
@@ -15,5 +15,5 @@ opt.o:
 function.o:
 	$(cc) -c -o function.o $(CFLAGS) function.c
 clean:
-	rm -f *.o $(bin) *~
+	del *.o $(bin) *~
 
