@@ -159,21 +159,22 @@ static void
 printtable (unsigned int from, unsigned int to, unsigned int mbegin,
 	    unsigned int mend, unsigned int col)
 {
-  unsigned int i, j, k, m;
+  unsigned int i, j, k;
 
-  for (k = col; (k / col) <= (to / col) + (to % col ? 1 : 0); k += col)
-    {
-      for (j = mbegin; j <= mend; j++)
+  for (k = from; k <=to ; k += col)
+    {	
+      for (j = mbegin; j <= mend ; j++)
 	{
-	  for (m = i = from + (k == col ? 0 : k - col);
-	       (i - m < col) && (i <= to); i++)
+	  for (i = k;
+	       i < ((k+col)>to?to+1:k+col) ; i++)
 	    {
 	      printf ("%ux%u=%u\t\t", i, j, i * j);
 	    }
-	  putchar ('\n');
+		putchar ('\n');
 	}
       putchar ('\n');
       putchar ('\n');
+	
     }
 
 }
