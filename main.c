@@ -61,7 +61,7 @@ main (int argc, const char *argv[])
   filename[0] = 0;
   fp = stdout;
 
-  for (ui_cindex = 1; (i =
+  for (ui_cindex = DSTART; (i =
 		       opt_action (argc, argv, cptrarr_param, carray_buff,
 				   BSIZE, DSTART)) != e_optend; ui_cindex++)
     {
