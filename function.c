@@ -52,8 +52,7 @@ sLen (const char *ch)
 {
   unsigned int i;
 
-  for (i = 0; ch[i]; i++)
-    {
-    }
+  for (i = 0; ch[i]; i++);
+
   return i;
 }

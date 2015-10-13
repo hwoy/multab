@@ -105,7 +105,7 @@ main (int argc, const char *argv[])
 
 	case opt_h:
 	  showHelp (argv[0], cptrarr_param, helpparam);
-	  return 0;
+	  return 1;
 
 	default:
 	  showHelp (argv[0], cptrarr_param, helpparam);
